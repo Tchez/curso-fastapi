@@ -7,6 +7,7 @@ from sqlalchemy.pool import StaticPool
 from curso_fast.app import app
 from curso_fast.database import get_session
 from curso_fast.models import User, table_registry
+from curso_fast.security import get_password_hash
 
 
 @pytest.fixture
@@ -38,14 +39,27 @@ def session():
 
 @pytest.fixture
 def user(session):
+    pwd = 'password'
+
     user = User(
         username='Teste',
         email='teste@test.com',
-        password='pass',
+        password=get_password_hash(pwd),
     )
 
     session.add(user)
     session.commit()
     session.refresh(user)
 
+    user.clean_password = pwd
     return user
+
+
+@pytest.fixture
+def token(client, user):
+    response = client.post(
+        '/token',
+        data={'username': user.email, 'password': user.clean_password},
+    )
+
+    return response.json()['access_token']
