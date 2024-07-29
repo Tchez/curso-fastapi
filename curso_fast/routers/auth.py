@@ -13,6 +13,7 @@ from curso_fast.schemas import (
 )
 from curso_fast.security import (
     create_access_token,
+    get_current_user,
     verify_password,
 )
 
@@ -41,5 +42,16 @@ def login(
 
     return {
         'access_token': access_token,
+        'token_type': 'Bearer',
+    }
+
+
+@router.post('/refresh_token', response_model=Token)
+def refresh_access_token(
+    user: User = Depends(get_current_user),
+) -> Token:
+    new_access_token = create_access_token({'sub': user.email})
+    return {
+        'access_token': new_access_token,
         'token_type': 'Bearer',
     }

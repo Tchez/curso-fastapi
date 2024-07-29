@@ -27,9 +27,9 @@ def test_create_user_com_username_ja_existente_deve_retornar_bad_request(
     response = client.post(
         '/users',
         json={
-            'username': 'Teste',
+            'username': user.username,
             'password': 'pass',
-            'email': 'outro_mail@test.com',
+            'email': 'mail@test.com',
         },
     )
 
@@ -45,7 +45,7 @@ def test_create_user_com_email_ja_existente_deve_retornar_bad_request(
         json={
             'username': 'outro_username',
             'password': 'pass',
-            'email': 'teste@test.com',
+            'email': user.email,
         },
     )
 
@@ -103,10 +103,10 @@ def test_update_user(client, user, token):
 
 
 def test_update_user_com_id_invalido_deve_retornar_not_enough_permissions(
-    client, user, token
+    client, user, other_user, token
 ):
     response = client.put(
-        f'/users/{user.id + 1}',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'test_username_updated',
@@ -130,10 +130,10 @@ def test_delete_user(client, user, token):
 
 
 def test_delete_user_com_id_invalido_deve_retornar_not_enough_permissions(
-    client, user, token
+    client, user, other_user, token
 ):
     response = client.delete(
-        f'/users/{user.id + 1}',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
     )
 

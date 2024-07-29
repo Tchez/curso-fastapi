@@ -1,3 +1,4 @@
+import factory
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -8,6 +9,15 @@ from curso_fast.app import app
 from curso_fast.database import get_session
 from curso_fast.models import User, table_registry
 from curso_fast.security import get_password_hash
+
+
+class UserFactory(factory.Factory):
+    class Meta:
+        model = User
+
+    username = factory.Sequence(lambda n: f'test{n}')
+    email = factory.LazyAttribute(lambda obj: f'{obj.username}@test.com')
+    password = factory.LazyAttribute(lambda obj: f'{obj.username}_password')
 
 
 @pytest.fixture
@@ -41,17 +51,24 @@ def session():
 def user(session):
     pwd = 'password'
 
-    user = User(
-        username='Teste',
-        email='teste@test.com',
-        password=get_password_hash(pwd),
-    )
+    user = UserFactory(password=get_password_hash(pwd))
 
     session.add(user)
     session.commit()
     session.refresh(user)
 
     user.clean_password = pwd
+    return user
+
+
+@pytest.fixture
+def other_user(session):
+    user = UserFactory()
+
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
     return user
 
 
