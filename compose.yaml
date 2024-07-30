@@ -1,0 +1,25 @@
+services:
+  curso_fast_database:
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_DB: app_db
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  curso_fast_app:
+    image: curso_fast_app
+    build: .
+    entrypoint: ./entrypoint.sh
+    ports:
+      - "8000:8000"
+    depends_on:
+      - curso_fast_database
+    environment:
+      DATABASE_URL: postgresql+psycopg://user:password@curso_fast_database:5432/app_db
+
+volumes:
+  pgdata:
