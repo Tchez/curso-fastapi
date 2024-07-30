@@ -47,3 +47,6 @@ class TodoUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
     state: TodoState | None = None
+
+
+# TODO: Alterar o User e Todo público para mostrar created_at e updated_at
